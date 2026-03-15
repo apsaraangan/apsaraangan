@@ -151,27 +151,35 @@ export function Navigation() {
           </div>
 
           {/* Mobile icons + menu toggle */}
-          <div className="md:hidden flex items-center gap-4">
-            <Link href="/favorites" className="relative">
-              <Heart size={20} className="text-[var(--blush-pink)]" />
+          <div className="md:hidden flex items-center gap-1 shrink-0">
+            <Link
+              href="/favorites"
+              className="relative flex items-center justify-center w-10 h-10 rounded-lg text-[var(--blush-pink)] touch-manipulation active:opacity-80"
+              aria-label="Favorites"
+            >
+              <Heart size={20} className="shrink-0" />
               {favoritesCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 bg-[var(--blush-pink-dark)] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center"
+                  className="absolute top-1 right-1 bg-[var(--blush-pink-dark)] text-white text-[10px] font-bold rounded-full min-w-4 h-4 flex items-center justify-center px-0.5"
                 >
                   {favoritesCount}
                 </motion.span>
               )}
             </Link>
 
-            <Link href="/cart" className="relative">
-              <ShoppingBag size={20} className="text-[var(--blush-pink)]" />
+            <Link
+              href="/cart"
+              className="relative flex items-center justify-center w-10 h-10 rounded-lg text-[var(--blush-pink)] touch-manipulation active:opacity-80"
+              aria-label="Cart"
+            >
+              <ShoppingBag size={20} className="shrink-0" />
               {cartCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 bg-[var(--blush-pink-dark)] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center"
+                  className="absolute top-1 right-1 bg-[var(--blush-pink-dark)] text-white text-[10px] font-bold rounded-full min-w-4 h-4 flex items-center justify-center px-0.5"
                 >
                   {cartCount}
                 </motion.span>
@@ -181,10 +189,10 @@ export function Navigation() {
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 -mr-2 text-[var(--blush-pink)] rounded-lg transition-colors touch-manipulation"
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-[var(--blush-pink)] touch-manipulation -mr-1"
               aria-label="Toggle menu"
             >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {isMenuOpen ? <X size={22} className="shrink-0" /> : <Menu size={22} className="shrink-0" />}
             </motion.button>
           </div>
         </div>

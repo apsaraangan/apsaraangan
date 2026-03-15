@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router";
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router";
 import { ShopProvider } from "@/context/ShopContext";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -14,6 +15,14 @@ import AdminAddProductsPage from "@/app/adminaddproducts/page";
 import ProductDetailRoute from "./routes/ProductDetailRoute";
 import "@/app/globals.css";
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function Layout({ children }: { children: React.ReactNode }) {
   return (
     <ShopProvider>
@@ -27,6 +36,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />

@@ -6,13 +6,13 @@ import { motion } from "motion/react";
 import { Instagram, Mail, MapPin, Phone, MessageCircle, Clock } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
-const WHATSAPP_NUMBER = "919876543210"; // ⚠️ Replace with your number
+const WHATSAPP_NUMBER = "+919270163206"; // ⚠️ Replace with your number
 
 const contactInfo = [
-  { icon: Phone, title: "Phone", content: "+91 98765 43210", link: "tel:+919876543210" },
-  { icon: Mail, title: "Email", content: "hello@apsaraangan.com", link: "mailto:hello@apsaraangan.com" },
+  { icon: Phone, title: "Phone", content: "+91 92720 16320", link: "tel:+919270163206" },
+  { icon: Mail, title: "Email", content: "apsaraangan@gmail.com", link: "mailto:apsaraangan@gmail.com" },
   { icon: MapPin, title: "Location", content: "Serving customers across India and internationally", link: null },
-  { icon: Instagram, title: "Instagram", content: "@apsaraangan", link: "https://instagram.com/apsaraangan" },
+  { icon: Instagram, title: "Instagram", content: "@apsaraangan", link: "https://www.instagram.com/apsaraangan?igsh=MWJpNGt2cHpibzV2Zg==" },
 ];
 
 export default function Contact() {

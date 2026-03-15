@@ -402,7 +402,19 @@ export function ProductDetailContent({
 
                 {product && (
                   <WhatsAppButton
-                    message={`Hi! I'm interested in "${product.name}" (₹${product.price}). Can you help me with details and customization?`}
+                    message={[
+                      `Hi! I'm interested in this product:`,
+                      "",
+                      `*${product.name}*`,
+                      `Price: ₹${product.price.toLocaleString()}`,
+                      product.description ? `Details: ${product.description}` : "",
+                      "",
+                      `Product image: ${product.images?.[0] ?? product.image}`,
+                      "",
+                      "Can you help me with details and customization?",
+                    ]
+                      .filter(Boolean)
+                      .join("\n")}
                     className="flex-1 min-h-[44px]"
                   >
                     Chat on WhatsApp
