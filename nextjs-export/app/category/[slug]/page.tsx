@@ -1,12 +1,14 @@
-"use client";
+ "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { ShoppingBag, Heart, Sparkles, ArrowLeft, ChevronRight } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
-import { categoryData, allCategorySlugs } from "@/lib/data";
+import { categoryData, allCategorySlugs, type Product } from "@/lib/data";
+import { fetchCategoryProducts } from "@/lib/api";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export default function CategoryPage() {
@@ -14,7 +16,48 @@ export default function CategoryPage() {
   const router = useRouter();
   const { addToCart, addToFavorites, removeFromFavorites, isFavorite, isInCart } = useShop();
 
-  const category = slug ? categoryData[slug] : null;
+  const staticCategory = slug ? categoryData[slug] : null;
+  const [products, setProducts] = useState<Product[]>(staticCategory?.products ?? []);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [slug]);
+
+  useEffect(() => {
+    if (!slug) return;
+
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    fetchCategoryProducts(slug)
+      .then((items) => {
+        if (cancelled) return;
+        if (items.length > 0) {
+          setProducts(items);
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setError("Could not load products from server. Showing any available static items.");
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slug]);
+
+  const category = staticCategory
+    ? { ...staticCategory, products }
+    : { title: slug, subtitle: "", collection: "resin" as const, products };
 
   if (!category) {
     return (
@@ -93,102 +136,130 @@ export default function CategoryPage() {
         </motion.div>
 
         {/* Products Grid */}
+        {loading && (
+          <p className="text-center mb-4 text-sm opacity-60">Loading products...</p>
+        )}
+        {error && (
+          <p className="text-center mb-4 text-xs text-red-500">{error}</p>
+        )}
+        {category.products.length === 0 && !loading && (
+          <p className="text-center mb-8 text-sm opacity-70">
+            No products found in this category yet.
+          </p>
+        )}
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16">
           {category.products.map((product, index) => (
-            <motion.div
+            <Link
               key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ delay: index * 0.08, duration: 0.5 }}
-              className="group relative bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500"
+              href={`/product/${encodeURIComponent(String(product.id))}`}
+              className="group"
             >
-              {/* Favourite */}
-              <motion.button
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={(e) => handleToggleFavorite(e, product)}
-                className="absolute top-2 right-2 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-[var(--blush-pink-light)] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
-                aria-label={isFavorite(product.id) ? "Remove from favourites" : "Add to favourites"}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ delay: index * 0.08, duration: 0.5 }}
+                className="relative bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500"
               >
-                <Heart
-                  size={15}
-                  className={`transition-colors ${
-                    isFavorite(product.id)
-                      ? "fill-[var(--blush-pink)] text-[var(--blush-pink)]"
-                      : "text-[var(--blush-pink)]"
-                  }`}
-                />
-              </motion.button>
+                {/* Favourite */}
+                <motion.button
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={(e) => handleToggleFavorite(e, product)}
+                  className="absolute top-2 right-2 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-[var(--blush-pink-light)] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+                  aria-label={isFavorite(product.id) ? "Remove from favourites" : "Add to favourites"}
+                >
+                  <Heart
+                    size={15}
+                    className={`transition-colors ${
+                      isFavorite(product.id)
+                        ? "fill-[var(--blush-pink)] text-[var(--blush-pink)]"
+                        : "text-[var(--blush-pink)]"
+                    }`}
+                  />
+                </motion.button>
 
-              {/* Image */}
-              <div className="relative aspect-square overflow-hidden bg-[var(--secondary)]">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 25vw"
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{
-                    background: `linear-gradient(to top, ${isGold ? "rgba(191,152,48,0.3)" : "rgba(212,137,154,0.3)"}, transparent)`,
-                  }}
-                />
-              </div>
-
-              {/* Info */}
-              <div className="p-3 md:p-4">
-                <p className="text-[10px] md:text-xs opacity-50 mb-1 uppercase tracking-wide">
-                  {product.category}
-                </p>
-                <h3 className="text-sm md:text-base font-medium mb-1 line-clamp-2 transition-colors duration-300">
-                  {product.name}
-                </h3>
-                {product.description && (
-                  <p className="text-[10px] md:text-xs opacity-60 mb-2 line-clamp-2">
-                    {product.description}
-                  </p>
-                )}
-                <div className="flex items-center justify-between mb-3">
-                  <span
-                    className="text-sm md:text-lg font-medium"
-                    style={{ color: accentDark }}
-                  >
-                    ₹{product.price.toLocaleString()}
-                  </span>
-                  {product.inStock && (
-                    <span className="text-[10px] md:text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                      In Stock
-                    </span>
-                  )}
+                {/* Image */}
+                <div className="relative aspect-square overflow-hidden bg-[var(--secondary)]">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 25vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{
+                      background: `linear-gradient(to top, ${
+                        isGold
+                          ? "rgba(191,152,48,0.3)"
+                          : "rgba(212,137,154,0.3)"
+                      }, transparent)`,
+                    }}
+                  />
                 </div>
 
-                {/* Add to Bag */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => addToCart(product)}
-                  disabled={isInCart(product.id)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 md:py-3 rounded-full font-medium text-xs md:text-sm transition-all min-h-[44px]"
-                  style={
-                    isInCart(product.id)
-                      ? { backgroundColor: "#e5e7eb", color: "#9ca3af", cursor: "not-allowed" }
-                      : {
-                          background: isGold
-                            ? "linear-gradient(to right, var(--gold), #a07a20)"
-                            : "linear-gradient(to right, var(--blush-pink), var(--blush-pink-dark))",
-                          color: "white",
-                          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                        }
-                  }
-                >
-                  <ShoppingBag size={14} />
-                  {isInCart(product.id) ? "Added to Bag" : "Add to Bag"}
-                </motion.button>
-              </div>
-            </motion.div>
+                {/* Info */}
+                <div className="p-3 md:p-4">
+                  <p className="text-[10px] md:text-xs opacity-50 mb-1 uppercase tracking-wide">
+                    {product.category}
+                  </p>
+                  <h3 className="text-sm md:text-base font-medium mb-1 line-clamp-2 transition-colors duration-300 group-hover:text-[var(--blush-pink-dark)]">
+                    {product.name}
+                  </h3>
+                  {product.description && (
+                    <p className="text-[10px] md:text-xs opacity-60 mb-2 line-clamp-2">
+                      {product.description}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between mb-3">
+                    <span
+                      className="text-sm md:text-lg font-medium"
+                      style={{ color: accentDark }}
+                    >
+                      ₹{product.price.toLocaleString()}
+                    </span>
+                    {product.inStock && (
+                      <span className="text-[10px] md:text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                        In Stock
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Add to Bag */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      addToCart(product);
+                    }}
+                    disabled={isInCart(product.id)}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 md:py-3 rounded-full font-medium text-xs md:text-sm transition-all min-h-[44px]"
+                    style={
+                      isInCart(product.id)
+                        ? {
+                            backgroundColor: "#e5e7eb",
+                            color: "#9ca3af",
+                            cursor: "not-allowed",
+                          }
+                        : {
+                            background: isGold
+                              ? "linear-gradient(to right, var(--gold), #a07a20)"
+                              : "linear-gradient(to right, var(--blush-pink), var(--blush-pink-dark))",
+                            color: "white",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                          }
+                    }
+                  >
+                    <ShoppingBag size={14} />
+                    {isInCart(product.id) ? "Added to Bag" : "Add to Bag"}
+                  </motion.button>
+                </div>
+              </motion.div>
+            </Link>
           ))}
         </div>
 
@@ -222,17 +293,19 @@ export default function CategoryPage() {
             >
               Customize on WhatsApp
             </WhatsAppButton>
-            <Link href="/customize">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 font-medium transition-all min-h-[48px]"
-                style={{ borderColor: accentColor, color: accentDark }}
-              >
-                View Customization Details
-                <ChevronRight size={16} />
-              </motion.button>
-            </Link>
+            {!isGold && (
+              <Link href="/customize">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 font-medium transition-all min-h-[48px]"
+                  style={{ borderColor: accentColor, color: accentDark }}
+                >
+                  View Customization Details
+                  <ChevronRight size={16} />
+                </motion.button>
+              </Link>
+            )}
           </div>
         </motion.div>
       </div>

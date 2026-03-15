@@ -3,6 +3,7 @@ import "./globals.css";
 import { ShopProvider } from "@/context/ShopContext";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.apsaraangan.com"), // ⚠️ Replace with your actual domain
@@ -50,7 +51,17 @@ export const metadata: Metadata = {
     title: "Apsara Angan — Handcrafted Custom Jewellery",
     description:
       "Bespoke resin and traditional jewellery handcrafted for brides and festive occasions.",
-    images: ["/og-image.jpg"],
+    images: [
+      "https://res.cloudinary.com/dofqzajjb/image/upload/v1773471877/WhatsApp_Image_2026-03-12_at_1.10.18_AM__1_-removebg-preview_ly47fc.png",
+    ],
+  },
+  icons: {
+    icon:
+      "https://res.cloudinary.com/dofqzajjb/image/upload/v1773471877/WhatsApp_Image_2026-03-12_at_1.10.18_AM__1_-removebg-preview_ly47fc.png",
+    shortcut:
+      "https://res.cloudinary.com/dofqzajjb/image/upload/v1773471877/WhatsApp_Image_2026-03-12_at_1.10.18_AM__1_-removebg-preview_ly47fc.png",
+    apple:
+      "https://res.cloudinary.com/dofqzajjb/image/upload/v1773471877/WhatsApp_Image_2026-03-12_at_1.10.18_AM__1_-removebg-preview_ly47fc.png",
   },
   robots: {
     index: true,
@@ -76,7 +87,7 @@ const jsonLd = {
   description:
     "Handcrafted custom resin and traditional jewellery for brides, weddings, and festive occasions.",
   url: "https://www.apsaraangan.com",
-  telephone: "+919876543210",
+  telephone: "+918103146100",
   email: "hello@apsaraangan.com",
   address: {
     "@type": "PostalAddress",
@@ -84,7 +95,7 @@ const jsonLd = {
   },
   sameAs: [
     "https://instagram.com/apsaraangan",
-    "https://wa.me/919876543210",
+    "https://wa.me/918103146100",
   ],
   openingHoursSpecification: [
     {
@@ -131,7 +142,9 @@ export default function RootLayout({
       <body>
         <ShopProvider>
           <Navigation />
-          <main>{children}</main>
+          <ScrollToTop>
+            <main>{children}</main>
+          </ScrollToTop>
           <Footer />
         </ShopProvider>
       </body>

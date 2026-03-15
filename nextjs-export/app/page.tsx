@@ -54,7 +54,7 @@ export default function Home() {
             loop
             playsInline
           >
-            <source src="https://res.cloudinary.com/dcs53etlz/video/upload/v1773149663/final_apsara_angan_ncalme.mp4" type="video/mp4" />
+            <source src="https://res.cloudinary.com/dofqzajjb/video/upload/v1773471720/IMG_3543_ybbdh4.mov" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-white" />
         </div>

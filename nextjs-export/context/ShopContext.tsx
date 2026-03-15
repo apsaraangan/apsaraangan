@@ -1,7 +1,17 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { Product } from "@/lib/data";
+import {
+  getSessionId,
+  fetchCart,
+  fetchFavorites,
+  addToCartApi,
+  removeFromCartApi,
+  updateCartQuantityApi,
+  addToFavoritesApi,
+  removeFromFavoritesApi,
+} from "@/lib/api";
 
 export type { Product };
 
@@ -9,17 +19,19 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
+type ProductId = string | number;
+
 interface ShopContextType {
   cart: CartItem[];
   favorites: Product[];
   addToCart: (product: Product) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  removeFromCart: (productId: ProductId) => void;
+  updateQuantity: (productId: ProductId, quantity: number) => void;
   clearCart: () => void;
   addToFavorites: (product: Product) => void;
-  removeFromFavorites: (productId: number) => void;
-  isFavorite: (productId: number) => boolean;
-  isInCart: (productId: number) => boolean;
+  removeFromFavorites: (productId: ProductId) => void;
+  isFavorite: (productId: ProductId) => boolean;
+  isInCart: (productId: ProductId) => boolean;
   getCartTotal: () => number;
   getCartCount: () => number;
 }
@@ -30,43 +42,89 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [favorites, setFavorites] = useState<Product[]>([]);
 
+  useEffect(() => {
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+    Promise.all([fetchCart(sessionId), fetchFavorites(sessionId)])
+      .then(([cartItems, favItems]) => {
+        setCart(cartItems as CartItem[]);
+        setFavorites(favItems);
+      })
+      .catch(() => {});
+  }, []);
+
   const addToCart = (product: Product) => {
-    setCart((prev) => {
-      const existing = prev.find((i) => i.id === product.id);
+    const sessionId = getSessionId();
+    const nextCart: CartItem[] = (() => {
+      const existing = cart.find((i) => String(i.id) === String(product.id));
       if (existing) {
-        return prev.map((i) =>
-          i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+        return cart.map((i) =>
+          String(i.id) === String(product.id)
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
-    });
+      return [...cart, { ...product, quantity: 1 }];
+    })();
+    setCart(nextCart);
+    if (sessionId) {
+      addToCartApi(sessionId, product).catch(() => setCart(cart));
+    }
   };
 
-  const removeFromCart = (productId: number) =>
-    setCart((prev) => prev.filter((i) => i.id !== productId));
+  const removeFromCart = (productId: ProductId) => {
+    const sessionId = getSessionId();
+    setCart((prev) => prev.filter((i) => String(i.id) !== String(productId)));
+    if (sessionId) {
+      removeFromCartApi(sessionId, productId).catch(() => {});
+    }
+  };
 
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = (productId: ProductId, quantity: number) => {
     if (quantity <= 0) return removeFromCart(productId);
     setCart((prev) =>
-      prev.map((i) => (i.id === productId ? { ...i, quantity } : i))
+      prev.map((i) =>
+        String(i.id) === String(productId) ? { ...i, quantity } : i
+      )
     );
+    const sessionId = getSessionId();
+    if (sessionId) {
+      updateCartQuantityApi(sessionId, productId, quantity).catch(() => {});
+    }
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+    const sessionId = getSessionId();
+    if (sessionId) {
+      cart.forEach((item) => removeFromCartApi(sessionId, item.id).catch(() => {}));
+    }
+  };
 
-  const addToFavorites = (product: Product) =>
-    setFavorites((prev) =>
-      prev.find((i) => i.id === product.id) ? prev : [...prev, product]
-    );
+  const addToFavorites = (product: Product) => {
+    if (favorites.some((i) => String(i.id) === String(product.id))) return;
+    setFavorites((prev) => [...prev, product]);
+    const sessionId = getSessionId();
+    if (sessionId) {
+      addToFavoritesApi(sessionId, product).catch(() =>
+        setFavorites((prev) => prev.filter((i) => String(i.id) !== String(product.id)))
+      );
+    }
+  };
 
-  const removeFromFavorites = (productId: number) =>
-    setFavorites((prev) => prev.filter((i) => i.id !== productId));
+  const removeFromFavorites = (productId: ProductId) => {
+    setFavorites((prev) => prev.filter((i) => String(i.id) !== String(productId)));
+    const sessionId = getSessionId();
+    if (sessionId) {
+      removeFromFavoritesApi(sessionId, productId).catch(() => {});
+    }
+  };
 
-  const isFavorite = (productId: number) =>
-    favorites.some((i) => i.id === productId);
+  const isFavorite = (productId: ProductId) =>
+    favorites.some((i) => String(i.id) === String(productId));
 
-  const isInCart = (productId: number) =>
-    cart.some((i) => i.id === productId);
+  const isInCart = (productId: ProductId) =>
+    cart.some((i) => String(i.id) === String(productId));
 
   const getCartTotal = () =>
     cart.reduce((total, i) => total + i.price * i.quantity, 0);

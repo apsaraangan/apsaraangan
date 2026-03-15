@@ -10,6 +10,10 @@ export interface Product {
   category: string;
   inStock: boolean;
   description?: string;
+  /** Multiple images for product detail carousel (from API) */
+  images?: string[];
+  /** Optional video URL (from API) */
+  videoUrl?: string;
 }
 
 export const mainCollections = [

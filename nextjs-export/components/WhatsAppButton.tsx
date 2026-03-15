@@ -10,8 +10,8 @@ interface WhatsAppButtonProps {
   children?: React.ReactNode;
 }
 
-// ⚠️ Replace "919876543210" with your actual WhatsApp number (country code + number, no + or spaces)
-const WHATSAPP_NUMBER = "919876543210";
+// WhatsApp number (country code + number, no + or spaces)
+const WHATSAPP_NUMBER = "918103146100";
 
 export function WhatsAppButton({
   message = "Hi! I'd like to know more about your jewellery",

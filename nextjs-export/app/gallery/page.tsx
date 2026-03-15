@@ -1,17 +1,59 @@
 "use client";
 
-import type { Metadata } from "next";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Heart, X, Sparkles } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { galleryImages } from "@/lib/data";
+import { fetchGalleryImages, type GalleryImageItem } from "@/lib/api";
+import { galleryImages as fallbackGallery } from "@/lib/data";
 
-type GalleryImage = (typeof galleryImages)[0];
+type GalleryImage = {
+  id: string;
+  src: string;
+  alt: string;
+  customerName: string;
+};
+
+function mapToGalleryImage(img: GalleryImageItem): GalleryImage {
+  return {
+    id: img._id,
+    src: img.imageUrl,
+    alt: img.alt || "Jewelry worn by customer",
+    customerName: img.customerName,
+  };
+}
 
 export default function Gallery() {
   const [selected, setSelected] = useState<GalleryImage | null>(null);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGalleryImages()
+      .then((data) => {
+        if (!cancelled) {
+          setGalleryImages(data.map(mapToGalleryImage));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setGalleryImages(
+            fallbackGallery.map((g) => ({
+              id: String(g.id),
+              src: g.src,
+              alt: g.alt,
+              customerName: g.customerName,
+            }))
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <div className="min-h-screen py-8 md:py-16">
@@ -41,6 +83,15 @@ export default function Gallery() {
         </motion.div>
 
         {/* Gallery Grid */}
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mb-8 md:mb-12">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="aspect-square rounded-xl bg-gray-200 animate-pulse" />
+            ))}
+          </div>
+        ) : galleryImages.length === 0 ? (
+          <p className="text-center text-gray-500 py-12">No gallery images yet.</p>
+        ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mb-8 md:mb-12">
           {galleryImages.map((image, index) => (
             <motion.div
@@ -78,6 +129,7 @@ export default function Gallery() {
             </motion.div>
           ))}
         </div>
+        )}
 
         {/* CTA */}
         <motion.div

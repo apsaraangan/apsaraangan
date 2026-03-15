@@ -1,25 +1,99 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, User, Phone, MapPin, PlusCircle, X } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
-
-const WHATSAPP_NUMBER = "919876543210";
+import { fetchCheckoutInfo, saveCheckoutInfo, type CheckoutInfo } from "@/lib/checkout";
 
 export default function CartPage() {
+  const router = useRouter();
   const { cart, removeFromCart, updateQuantity, getCartTotal } = useShop();
+  const [showCustomerForm, setShowCustomerForm] = useState(false);
+  const [hasSavedDetails, setHasSavedDetails] = useState(false);
+  const [checkingDetails, setCheckingDetails] = useState(true);
+  const [formData, setFormData] = useState<CheckoutInfo>({
+    name: "",
+    number: "",
+    defaultAddress: "",
+    otherAddresses: [""],
+  });
 
-  const handleCheckout = () => {
-    const details = cart
-      .map((item) => `${item.name} (x${item.quantity}) - ₹${(item.price * item.quantity).toLocaleString()}`)
-      .join("\n");
-    const total = getCartTotal();
-    const msg = `Hi! I'd like to place an order:\n\n${details}\n\nTotal: ₹${total.toLocaleString()}\n\nPlease confirm availability and delivery details.`;
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const info = await fetchCheckoutInfo();
+      if (!mounted) return;
+      if (info) {
+        setHasSavedDetails(true);
+      }
+      setCheckingDetails(false);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handlePlaceOrder = () => {
+    if (checkingDetails) return;
+    if (hasSavedDetails) {
+      router.push("/checkout");
+    } else {
+      setShowCustomerForm(true);
+    }
   };
+
+  const handleAddAddress = () => {
+    setFormData((prev) => ({
+      ...prev,
+      otherAddresses: [...prev.otherAddresses, ""],
+    }));
+  };
+
+  const handleRemoveAddress = (index: number) => {
+    if (formData.otherAddresses.length <= 1) return;
+    setFormData((prev) => ({
+      ...prev,
+      otherAddresses: prev.otherAddresses.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleAddressChange = (index: number, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      otherAddresses: prev.otherAddresses.map((addr, i) =>
+        i === index ? value : addr
+      ),
+    }));
+  };
+
+  const handleContinue = async () => {
+    const { name, number, defaultAddress } = formData;
+    if (!name.trim() || !number.trim() || !defaultAddress.trim()) return;
+
+    const checkoutInfo: CheckoutInfo = {
+      ...formData,
+      name: name.trim(),
+      number: number.trim(),
+      defaultAddress: defaultAddress.trim(),
+      otherAddresses: formData.otherAddresses.filter((a) => a.trim()),
+    };
+
+    const saved = await saveCheckoutInfo(checkoutInfo);
+    if (saved) {
+      setHasSavedDetails(true);
+      setShowCustomerForm(false);
+      router.push("/checkout");
+    }
+  };
+
+  const isFormValid =
+    formData.name.trim() &&
+    formData.number.trim() &&
+    formData.defaultAddress.trim();
 
   if (cart.length === 0) {
     return (
@@ -44,7 +118,7 @@ export default function CartPage() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-[var(--blush-pink)] to-[var(--blush-pink-dark)] text-white rounded-full shadow-lg hover:shadow-xl transition-all font-medium min-h-[48px]"
+                className="inline-flex items-center justify-center gap-2 px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-[var(--blush-pink)] to-[var(--blush-pink-dark)] text-white rounded-full shadow-lg hover:shadow-xl transition-all font-medium min-h-[48px]"
               >
                 Continue Shopping <ArrowRight size={20} />
               </motion.button>
@@ -66,7 +140,6 @@ export default function CartPage() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-
           {/* Cart items */}
           <div className="lg:col-span-2 space-y-4">
             <AnimatePresence>
@@ -172,11 +245,11 @@ export default function CartPage() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={handleCheckout}
-                className="w-full flex items-center justify-center gap-2 py-3 md:py-4 bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-full font-medium shadow-lg hover:shadow-xl transition-all min-h-[52px]"
+                onClick={handlePlaceOrder}
+                className="w-full flex items-center justify-center gap-2 py-3 md:py-4 bg-gradient-to-r from-[var(--blush-pink)] to-[var(--blush-pink-dark)] hover:from-[var(--blush-pink-dark)] hover:to-[var(--blush-pink)] text-white rounded-full font-medium shadow-lg hover:shadow-xl transition-all min-h-[52px]"
               >
                 <ShoppingBag size={20} />
-                Order via WhatsApp
+                Place Order
               </motion.button>
 
               <div className="mt-4 text-center">
@@ -191,6 +264,162 @@ export default function CartPage() {
           </motion.div>
         </div>
       </div>
+
+      {/* Customer Info Modal */}
+      <AnimatePresence>
+        {showCustomerForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setShowCustomerForm(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-[var(--blush-pink)]/20"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-['Playfair_Display'] text-xl md:text-2xl">
+                  Delivery Information
+                </h2>
+                <button
+                  onClick={() => setShowCustomerForm(false)}
+                  className="p-2 hover:bg-[var(--blush-pink-light)] rounded-full transition-colors"
+                  aria-label="Close"
+                >
+                  <X size={20} className="text-[var(--blush-pink-dark)]" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-[var(--blush-pink-dark)]">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <User
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--blush-pink)]"
+                    />
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, name: e.target.value }))
+                      }
+                      placeholder="Enter your name"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--blush-pink)]/40 transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-[var(--blush-pink-dark)]">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--blush-pink)]"
+                    />
+                    <input
+                      type="tel"
+                      value={formData.number}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, number: e.target.value }))
+                      }
+                      placeholder="10-digit mobile number"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--blush-pink)]/40 transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-[var(--blush-pink-dark)]">
+                    Default Address
+                  </label>
+                  <div className="relative">
+                    <MapPin
+                      size={18}
+                      className="absolute left-3 top-3 text-[var(--blush-pink)]"
+                    />
+                    <textarea
+                      value={formData.defaultAddress}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          defaultAddress: e.target.value,
+                        }))
+                      }
+                      placeholder="House/Flat no., Building, Street, City, State, Pincode"
+                      rows={3}
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--blush-pink)]/40 transition resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium text-[var(--blush-pink-dark)]">
+                      Other Addresses
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleAddAddress}
+                      className="flex items-center gap-1 text-sm text-[var(--blush-pink-dark)] hover:text-[var(--blush-pink)] transition-colors"
+                    >
+                      <PlusCircle size={16} />
+                      Add address
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {formData.otherAddresses.map((addr, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={addr}
+                          onChange={(e) => handleAddressChange(index, e.target.value)}
+                          placeholder={`Address ${index + 1} (optional)`}
+                          className="flex-1 px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--blush-pink)]/40 transition text-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAddress(index)}
+                          disabled={formData.otherAddresses.length <= 1}
+                          className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          aria-label="Remove address"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <motion.button
+                whileHover={isFormValid ? { scale: 1.02 } : {}}
+                whileTap={isFormValid ? { scale: 0.98 } : {}}
+                onClick={handleContinue}
+                disabled={!isFormValid}
+                className={`w-full mt-6 py-3 md:py-4 rounded-full font-medium flex items-center justify-center gap-2 min-h-[52px] transition-all ${
+                  isFormValid
+                    ? "bg-gradient-to-r from-[var(--blush-pink)] to-[var(--blush-pink-dark)] hover:from-[var(--blush-pink-dark)] hover:to-[var(--blush-pink)] text-white shadow-lg hover:shadow-xl"
+                    : "bg-gray-200 cursor-not-allowed opacity-50 text-gray-600"
+                }`}
+              >
+                Continue
+                <ArrowRight size={20} />
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

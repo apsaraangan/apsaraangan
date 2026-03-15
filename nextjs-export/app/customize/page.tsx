@@ -157,11 +157,11 @@ export default function Customize() {
               </h2>
               <div className="space-y-2 md:space-y-3">
                 {[
-                  "Booking charge: ₹500 to reserve your date",
-                  "Call arranged for design discussion and finalization",
-                  "Photos and videos shared after making",
-                  "Changes made if required",
-                  "Remaining balance paid before dispatch",
+                  "₹500 booking fee to secure your date",
+                  "Design discussion and finalization via call",
+                  "Photos and videos shared after completion",
+                  "Revisions accommodated if required",
+                  "Remaining balance payable before dispatch ✨",
                 ].map((item, i) => (
                   <p key={i} className="flex items-start gap-2 text-sm md:text-base">
                     <CheckCircle2 size={18} className="shrink-0 mt-0.5" />

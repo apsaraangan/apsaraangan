@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X, ShoppingBag, Heart, ArrowLeft, Sparkles } from "lucide-react";
+import { Menu, X, ShoppingBag, Heart, ArrowLeft } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
 
 export function Navigation() {
@@ -68,11 +69,17 @@ export function Navigation() {
               onClick={() => setIsMenuOpen(false)}
             >
               <motion.div
-                whileHover={{ scale: 1.05, rotate: 5 }}
+                whileHover={{ scale: 1.05, rotate: 2 }}
                 transition={{ duration: 0.3 }}
-                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[var(--blush-pink-light)] to-[var(--gold-light)] flex items-center justify-center shadow-md"
+                className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden bg-white flex items-center justify-center shadow-md border border-[var(--blush-pink-light)]"
               >
-                <Sparkles size={20} className="text-[var(--gold)]" />
+                <Image
+                  src="https://res.cloudinary.com/dofqzajjb/image/upload/v1773471877/WhatsApp_Image_2026-03-12_at_1.10.18_AM__1_-removebg-preview_ly47fc.png"
+                  alt="Apsara Angan logo"
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                />
               </motion.div>
               <div className="flex flex-col">
                 <motion.span

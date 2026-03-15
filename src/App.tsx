@@ -10,6 +10,8 @@ import Contact from "@/app/contact/page";
 import Cart from "@/app/cart/page";
 import Favorites from "@/app/favorites/page";
 import CategoryPage from "@/app/category/[slug]/page";
+import AdminAddProductsPage from "@/app/adminaddproducts/page";
+import ProductDetailRoute from "./routes/ProductDetailRoute";
 import "@/app/globals.css";
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -35,6 +37,8 @@ export default function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/category/:slug" element={<CategoryPage />} />
+          <Route path="/product/:id" element={<ProductDetailRoute />} />
+          <Route path="/adminaddproducts" element={<AdminAddProductsPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>
