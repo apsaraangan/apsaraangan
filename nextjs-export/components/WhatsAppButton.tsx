@@ -11,7 +11,7 @@ interface WhatsAppButtonProps {
 }
 
 // WhatsApp number (country code + number, no + or spaces) – shared for order/chat links
-export const WHATSAPP_NUMBER = "918103146100";
+export const WHATSAPP_NUMBER = "+919270163206";
 
 export function WhatsAppButton({
   message = "Hi! I'd like to know more about your jewellery",

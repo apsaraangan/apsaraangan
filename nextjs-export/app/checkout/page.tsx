@@ -36,7 +36,7 @@ export default function CheckoutPage() {
   const handlePlaceOrder = () => {
     if (!selectedPayment || !checkoutInfo || cart.length === 0) return;
 
-    const phone = "918103146100"; // WhatsApp number
+    const phone = "+919270163206"; // WhatsApp number
     const itemsText = cart
       .map(
         (item, index) =>

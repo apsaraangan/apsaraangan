@@ -87,15 +87,15 @@ const jsonLd = {
   description:
     "Handcrafted custom resin and traditional jewellery for brides, weddings, and festive occasions.",
   url: "https://www.apsaraangan.com",
-  telephone: "+918103146100",
-  email: "hello@apsaraangan.com",
+  telephone: "+919270163206",
+    email: "apsaraangan@gmail.com",
   address: {
     "@type": "PostalAddress",
     addressCountry: "IN",
   },
   sameAs: [
     "https://instagram.com/apsaraangan",
-    "https://wa.me/918103146100",
+    "https://wa.me/+919270163206",
   ],
   openingHoursSpecification: [
     {
