@@ -2,10 +2,15 @@ import type { Product } from "./data";
 
 const API_BASE_URL =
   (typeof process !== "undefined" &&
-    // Vite / browser env may not expose NEXT_PUBLIC_*, so fall back to localhost
     (process as any)?.env &&
-    (process as any).env.NEXT_PUBLIC_API_BASE_URL) ||
-  "http://localhost:4000";
+    (
+      // Prefer Next.js-style public env var in production (Vercel)
+      (process as any).env.NEXT_PUBLIC_API_BASE_URL ||
+      // Also support Vite-style env var name you configured
+      (process as any).env.VITE_API_URL
+    )) ||
+  // Final fallback (e.g. if no env var is set)
+  "https://apsaraangan-backend.onrender.com";
 
 const mapAnyToProduct = (p: any): Product => {
   const images = Array.isArray(p.imageUrls) && p.imageUrls.length
