@@ -1,28 +1,27 @@
 "use client";
 
-import type { Metadata } from "next";
-import { useState } from "react";
+import React, { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { Instagram, Mail, MapPin, Phone, MessageCircle, Clock } from "lucide-react";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { WhatsAppButton } from "../../components/WhatsAppButton";
 
 const WHATSAPP_NUMBER = "+919270163206"; // ⚠️ Replace with your number
 
 const contactInfo = [
   { icon: Phone, title: "Phone", content: "+91 92720 16320", link: "tel:+919270163206" },
   { icon: Mail, title: "Email", content: "apsaraangan@gmail.com", link: "mailto:apsaraangan@gmail.com" },
-  { icon: MapPin, title: "Location", content: "Serving customers across India and internationally", link: null },
+  { icon: MapPin, title: "Address", content: "H.NO.1237, Rahul Apartment, Nandanvan Main Rd, opp. SHRAVAN HOSPITAL, near DELHI CHAP CORNER, New Nandanvan Layout, Ganesh Nagar, Azamshah Layout, Nagpur, Maharashtra 440024", link: "https://maps.app.goo.gl/RUrcn4Py3kXs6oo7A?g_st=iw" },
   { icon: Instagram, title: "Instagram", content: "@apsaraangan", link: "https://www.instagram.com/apsaraangan?igsh=MWJpNGt2cHpibzV2Zg==" },
 ];
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const msg = `Hi! I'm ${form.name}.\n\nEmail: ${form.email}\nPhone: ${form.phone}\n\nMessage: ${form.message}`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
