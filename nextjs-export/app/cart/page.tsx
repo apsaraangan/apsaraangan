@@ -180,7 +180,7 @@ export default function CartPage() {
               </div>
 
               <p className="text-xs md:text-sm opacity-60 mb-4 text-center">
-                Delivery charges calculated at checkout
+                Order will be placed via WhatsApp
               </p>
 
               <motion.button
