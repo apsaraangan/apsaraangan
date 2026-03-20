@@ -100,17 +100,21 @@ export default function CategoryPage() {
           className="text-center mb-8 md:mb-12"
         >
           {/* Breadcrumb */}
-          <div className="flex items-center justify-center gap-2 text-xs md:text-sm opacity-50 mb-4">
-            <Link href="/" className="hover:opacity-80 transition-opacity">Home</Link>
-            <ChevronRight size={12} />
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs md:text-sm opacity-50 mb-4 leading-none">
+            <Link href="/" className="hover:opacity-80 transition-opacity leading-none whitespace-nowrap">
+              Home
+            </Link>
+            <ChevronRight size={12} className="shrink-0 relative top-[1px]" />
             <span
-              className="cursor-pointer hover:opacity-80 transition-opacity"
+              className="cursor-pointer hover:opacity-80 transition-opacity leading-none whitespace-nowrap inline-flex items-center"
               onClick={() => router.back()}
             >
               Collections
             </span>
-            <ChevronRight size={12} />
-            <span className="opacity-100 font-medium">{category.title}</span>
+            <ChevronRight size={12} className="shrink-0 relative top-[1px]" />
+            <span className="opacity-100 font-medium leading-none whitespace-nowrap">
+              {category.title}
+            </span>
           </div>
 
           {/* Collection badge */}

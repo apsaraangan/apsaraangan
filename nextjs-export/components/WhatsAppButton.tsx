@@ -2,6 +2,7 @@
 
 import { MessageCircle } from "lucide-react";
 import { motion } from "motion/react";
+import { appendOrderIdToMessage } from "@/lib/whatsapp";
 
 interface WhatsAppButtonProps {
   message?: string;
@@ -20,7 +21,7 @@ export function WhatsAppButton({
   children,
 }: WhatsAppButtonProps) {
   const handleClick = () => {
-    const encodedMessage = encodeURIComponent(message);
+    const encodedMessage = encodeURIComponent(appendOrderIdToMessage(message));
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, "_blank");
   };
 

@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/cart", "/favorites", "/api/"],
       },
     ],
-    sitemap: "https://www.apsaraangan.com/sitemap.xml", // ⚠️ Replace with your domain
+    sitemap: "https://www.apsaraangan.in/sitemap.xml", // ⚠️ Replace with your domain
   };
 }

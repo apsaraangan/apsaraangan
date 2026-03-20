@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { allCategorySlugs } from "@/lib/data";
 
-const BASE_URL = "https://www.apsaraangan.com"; // ⚠️ Replace with your domain
+const BASE_URL = "https://www.apsaraangan.in"; // ⚠️ Replace with your domain
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [

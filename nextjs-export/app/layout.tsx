@@ -5,8 +5,11 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 
+const logoUrl =
+  "https://res.cloudinary.com/dofqzajjb/image/upload/v1773471877/WhatsApp_Image_2026-03-12_at_1.10.18_AM__1_-removebg-preview_ly47fc.png";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.apsaraangan.com"), // ⚠️ Replace with your actual domain
+  metadataBase: new URL("https://www.apsaraangan.in"), // ⚠️ Replace with your actual domain
   title: {
     default: "Apsara Angan — Handcrafted Custom Jewellery in India",
     template: "%s | Apsara Angan",
@@ -32,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://www.apsaraangan.com",
+    url: "https://www.apsaraangan.in",
     siteName: "Apsara Angan",
     title: "Apsara Angan — Handcrafted Custom Jewellery",
     description:
@@ -56,12 +59,9 @@ export const metadata: Metadata = {
     ],
   },
   icons: {
-    icon:
-      "https://res.cloudinary.com/dofqzajjb/image/upload/v1773471877/WhatsApp_Image_2026-03-12_at_1.10.18_AM__1_-removebg-preview_ly47fc.png",
-    shortcut:
-      "https://res.cloudinary.com/dofqzajjb/image/upload/v1773471877/WhatsApp_Image_2026-03-12_at_1.10.18_AM__1_-removebg-preview_ly47fc.png",
-    apple:
-      "https://res.cloudinary.com/dofqzajjb/image/upload/v1773471877/WhatsApp_Image_2026-03-12_at_1.10.18_AM__1_-removebg-preview_ly47fc.png",
+    icon: logoUrl,
+    shortcut: logoUrl,
+    apple: logoUrl,
   },
   robots: {
     index: true,
@@ -86,7 +86,7 @@ const jsonLd = {
   name: "Apsara Angan",
   description:
     "Handcrafted custom resin and traditional jewellery for brides, weddings, and festive occasions.",
-  url: "https://www.apsaraangan.com",
+  url: "https://www.apsaraangan.in",
   telephone: "+919270163206",
     email: "apsaraangan@gmail.com",
   address: {
@@ -134,6 +134,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Ensure favicon shows in browser tab (some browsers ignore remote metadata icons). */}
+        <link rel="icon" href={logoUrl} type="image/png" />
+        <link rel="shortcut icon" href={logoUrl} type="image/png" />
+        <link rel="apple-touch-icon" href={logoUrl} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

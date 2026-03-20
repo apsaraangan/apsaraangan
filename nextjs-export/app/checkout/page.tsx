@@ -8,6 +8,7 @@ import { motion } from "motion/react";
 import { ShoppingBag, ArrowLeft, CreditCard, Banknote, CheckCircle2 } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
 import { fetchCheckoutInfo, type CheckoutInfo } from "@/lib/checkout";
+import { appendOrderIdToMessage } from "@/lib/whatsapp";
 
 type PaymentMethod = "cod" | "paynow" | null;
 
@@ -50,14 +51,15 @@ export default function CheckoutPage() {
     const paymentText =
       selectedPayment === "cod" ? "Cash on Delivery (COD)" : "Pay Now";
 
-    const message =
+    const message = appendOrderIdToMessage(
       `Hi! I want to place an order from the website.\n\n` +
       `Name: ${checkoutInfo.name}\n` +
       `Phone: ${checkoutInfo.number}\n` +
       `Address: ${checkoutInfo.defaultAddress}\n\n` +
       `Items in cart:\n${itemsText}\n\n` +
       `Total: ₹${total.toLocaleString()}\n` +
-      `Payment option chosen: ${paymentText}`;
+      `Payment option chosen: ${paymentText}`
+    );
 
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 

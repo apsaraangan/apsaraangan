@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
 import { WHATSAPP_NUMBER } from "@/components/WhatsAppButton";
+import { appendOrderIdToMessage } from "@/lib/whatsapp";
 import type { CartItem } from "@/context/ShopContext";
 
 function buildOrderMessage(cart: CartItem[], total: number): string {
@@ -29,7 +30,7 @@ export default function CartPage() {
 
   const handlePlaceOrder = () => {
     const total = getCartTotal();
-    const message = buildOrderMessage(cart, total);
+    const message = appendOrderIdToMessage(buildOrderMessage(cart, total));
     window.open(
       `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
       "_blank"

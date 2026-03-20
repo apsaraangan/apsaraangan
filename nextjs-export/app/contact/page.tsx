@@ -4,6 +4,7 @@ import React, { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { Instagram, Mail, MapPin, Phone, MessageCircle, Clock } from "lucide-react";
 import { WhatsAppButton } from "../../components/WhatsAppButton";
+import { appendOrderIdToMessage } from "@/lib/whatsapp";
 
 const WHATSAPP_NUMBER = "+919270163206"; // ⚠️ Replace with your number
 
@@ -23,7 +24,9 @@ export default function Contact() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const msg = `Hi! I'm ${form.name}.\n\nEmail: ${form.email}\nPhone: ${form.phone}\n\nMessage: ${form.message}`;
+    const msg = appendOrderIdToMessage(
+      `Hi! I'm ${form.name}.\n\nEmail: ${form.email}\nPhone: ${form.phone}\n\nMessage: ${form.message}`
+    );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 

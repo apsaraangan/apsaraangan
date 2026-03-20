@@ -13,6 +13,7 @@ import Favorites from "@/app/favorites/page";
 import CategoryPage from "@/app/category/[slug]/page";
 import AdminAddProductsPage from "@/app/adminaddproducts/page";
 import ProductDetailRoute from "./routes/ProductDetailRoute";
+import { Seo } from "./seo";
 import "@/app/globals.css";
 
 function ScrollToTop() {
@@ -24,8 +25,11 @@ function ScrollToTop() {
 }
 
 function Layout({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+
   return (
     <ShopProvider>
+      <Seo pathname={pathname} />
       <Navigation />
       <main>{children}</main>
       <Footer />
