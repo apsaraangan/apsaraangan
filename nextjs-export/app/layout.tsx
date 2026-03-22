@@ -8,6 +8,9 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 const logoUrl =
   "https://res.cloudinary.com/dofqzajjb/image/upload/v1773471877/WhatsApp_Image_2026-03-12_at_1.10.18_AM__1_-removebg-preview_ly47fc.png";
 
+/** Served from /public/favicon.png — reliable in dev & production (remote URLs are often ignored for tab icons). */
+const faviconPath = "/favicon.png";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.apsaraangan.in"), // ⚠️ Replace with your actual domain
   title: {
@@ -59,9 +62,9 @@ export const metadata: Metadata = {
     ],
   },
   icons: {
-    icon: logoUrl,
-    shortcut: logoUrl,
-    apple: logoUrl,
+    icon: [{ url: faviconPath, type: "image/png", sizes: "any" }],
+    shortcut: faviconPath,
+    apple: faviconPath,
   },
   robots: {
     index: true,
@@ -134,10 +137,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Ensure favicon shows in browser tab (some browsers ignore remote metadata icons). */}
-        <link rel="icon" href={logoUrl} type="image/png" />
-        <link rel="shortcut icon" href={logoUrl} type="image/png" />
-        <link rel="apple-touch-icon" href={logoUrl} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

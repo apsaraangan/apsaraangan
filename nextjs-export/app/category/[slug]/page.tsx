@@ -92,6 +92,36 @@ export default function CategoryPage() {
     <div className="min-h-screen py-8 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
+        {/* Breadcrumb: outside text-center header; array children = no whitespace flex items; w-max + nowrap = one row */}
+        <div className="mb-4 w-full min-w-0 overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch]">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex w-max max-w-none flex-nowrap items-center gap-2 text-xs md:text-sm opacity-50"
+          >
+            {[
+              <Link
+                key="bc-home"
+                href="/"
+                className="inline-flex shrink-0 items-center whitespace-nowrap min-h-0 py-0.5 hover:opacity-80 transition-opacity"
+              >
+                Home
+              </Link>,
+              <ChevronRight key="bc-1" size={12} className="shrink-0" aria-hidden />,
+              <span
+                key="bc-collections"
+                className="shrink-0 cursor-pointer whitespace-nowrap py-0.5 hover:opacity-80 transition-opacity"
+                onClick={() => router.back()}
+              >
+                Collections
+              </span>,
+              <ChevronRight key="bc-2" size={12} className="shrink-0" aria-hidden />,
+              <span key="bc-title" className="shrink-0 whitespace-nowrap font-medium opacity-100 py-0.5">
+                {category.title}
+              </span>,
+            ]}
+          </nav>
+        </div>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -99,24 +129,6 @@ export default function CategoryPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 md:mb-12"
         >
-          {/* Breadcrumb */}
-          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs md:text-sm opacity-50 mb-4 leading-none">
-            <Link href="/" className="hover:opacity-80 transition-opacity leading-none whitespace-nowrap">
-              Home
-            </Link>
-            <ChevronRight size={12} className="shrink-0 relative top-[1px]" />
-            <span
-              className="cursor-pointer hover:opacity-80 transition-opacity leading-none whitespace-nowrap inline-flex items-center"
-              onClick={() => router.back()}
-            >
-              Collections
-            </span>
-            <ChevronRight size={12} className="shrink-0 relative top-[1px]" />
-            <span className="opacity-100 font-medium leading-none whitespace-nowrap">
-              {category.title}
-            </span>
-          </div>
-
           {/* Collection badge */}
           <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
